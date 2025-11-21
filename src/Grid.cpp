@@ -69,7 +69,12 @@ void Grid::render(RenderWindow& window)
     for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
             if (cells[x][y]->isAlive()) {
+                cellShape.setFillColor(Color::Magenta);
                 cellShape.setPosition(x * cellSize, y * cellSize);
+                window.draw(cellShape);
+            }
+            if (!cells[x][y]->isAlive()) {
+                cellShape.setFillColor(Color::Blue);
                 window.draw(cellShape);
             }
         }

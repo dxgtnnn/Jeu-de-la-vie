@@ -7,7 +7,7 @@ int main() {
 
     RenderWindow window(
         VideoMode(gridWidth * cellSize, gridHeight * cellSize),
-        "Game of Life - OOP & Heritage"
+        "Game of life"
     );
 
     Grid grid(gridWidth, gridHeight, cellSize);
