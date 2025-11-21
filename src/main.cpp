@@ -2,8 +2,8 @@
 
 int main() {
     const int cellSize = 10;
-    const int gridWidth = 100;
-    const int gridHeight = 100;
+    const int gridWidth = 250;
+    const int gridHeight = 250;
 
     RenderWindow window(
         VideoMode(gridWidth * cellSize, gridHeight * cellSize),
