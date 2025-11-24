@@ -1,28 +1,13 @@
-#include "Grid.hpp"
+#include "Game.hpp"
 
-int main() {
+int main()
+{
     const int cellSize = 10;
-    const int gridWidth = 250;
-    const int gridHeight = 250;
+    const int gridWidth = 192;
+    const int gridHeight = 108;
 
-    RenderWindow window(
-        VideoMode(gridWidth * cellSize, gridHeight * cellSize),
-        "Game of life"
-    );
+    Game game(gridWidth, gridHeight, cellSize, "input/192108.txt");
+    game.run();
 
-    Grid grid(gridWidth, gridHeight, cellSize);
-    grid.initialize();
-
-    while (window.isOpen()) {
-        Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed)
-                window.close();
-        }
-
-        grid.update();
-        grid.render(window);
-
-        sleep(milliseconds(100));
-    }
+    return 0;
 }

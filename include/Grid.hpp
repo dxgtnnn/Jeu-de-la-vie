@@ -12,8 +12,11 @@ class Grid {
     public:
         Grid(int width, int height, int cellSize);
         ~Grid();
-        void initialize();
+        void initialize(const string path);
         void update();
-        void render(RenderWindow& window);
+        void game(RenderWindow& window);
         int countNeighbors(int x, int y) const;
+        void clickCell(int x, int y);
+        void clear();
+        void randomize();
 };
