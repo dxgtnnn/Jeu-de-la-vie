@@ -127,3 +127,24 @@ void Grid::randomize()
                 cells[x][y] = new DeadCell();
         }
 }
+
+string Grid::getState() const
+{
+    ostringstream out;
+    out << width << " " << height << "\n";
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            out << (cells[x][y]->isAlive() ? 1 : 0);
+            if (x < width - 1)
+                out << " ";
+        }
+        out << "\n";
+    }
+    return out.str();
+}
+
+bool Grid::getCellState(int x, int y) const
+{
+    return cells[x][y]->isAlive();
+}

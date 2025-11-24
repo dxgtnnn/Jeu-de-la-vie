@@ -16,6 +16,8 @@ SRC	=	src/Grid.cpp 		\
 		src/AliveCell.cpp 	\
 		src/DeadCell.cpp 	\
 		src/Game.cpp 		\
+		src/ConsoleMode.cpp \
+		src/GUI.cpp			\
 
 OBJ	=	$(SRC:.cpp=.o)
 

@@ -3,6 +3,9 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <sstream>
+#include <filesystem>
 #include <cstdlib>
 #include <ctime>
 #include <SFML/System.hpp>
@@ -10,6 +13,7 @@
 
 using namespace std;
 using namespace sf;
+using namespace filesystem;
 
 class Cell {
     public:

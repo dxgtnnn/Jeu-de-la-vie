@@ -2,8 +2,8 @@
 
 #include "Grid.hpp"
 
-class Game {
+class GUI {
     public:
-        Game() = default;
+        GUI() = default;
         void run();
 };

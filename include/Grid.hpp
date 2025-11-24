@@ -19,4 +19,6 @@ class Grid {
         void clickCell(int x, int y);
         void clear();
         void randomize();
+        bool getCellState(int x, int y) const;
+        string getState() const;
 };
