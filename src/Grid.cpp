@@ -12,18 +12,26 @@ Grid::~Grid()
     }
 }
 
+int Grid::getWidth()
+{
+    return width;
+}
+
+int Grid::getHeight()
+{
+    return height;
+}
+
 void Grid::initialize(const string path)
 {
     ifstream file(path);
-    int wid = 0;
-    int hei = 0;
     int value = 0;
 
     if (!file) {
         cerr << "Erreur : impossible d'ouvrir le fichier " << path << "\n" << endl;
         exit(84);
     }
-    file >> wid >> hei;
+    file >> width >> height;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             file >> value;
@@ -83,9 +91,8 @@ void Grid::game(RenderWindow& window)
                 cellShape.setFillColor(Color::Blue);
                 cellShape.setPosition(x * cellSize, y * cellSize);
                 window.draw(cellShape);
-            }
-            if (!cells[x][y]->isAlive()) {
-                cellShape.setFillColor(Color(255, 255, 255, 255)); // Color(red, green, blue, opacity);
+            } else {
+                cellShape.setFillColor(Color::White); // Color(red, green, blue, opacity);
                 window.draw(cellShape);
             }
         }

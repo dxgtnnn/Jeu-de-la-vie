@@ -9,9 +9,9 @@ void Game::run()
     GUI gui;
 
     cout << "Choisissez un mode :" << endl;
-    cout << "1 - Mode console" << endl;
-    cout << "2 - Mode graphique (SFML)" << endl;
-    cout << "> ";
+    cout << "1 - Terminal" << endl;
+    cout << "2 - Visuel" << endl;
+    cout << "Mon choix > ";
     cin >> choice;
     if (choice == 1)
         console.run();

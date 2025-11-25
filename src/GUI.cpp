@@ -4,11 +4,19 @@
 void GUI::run()
 {
     const int cellSize = 10;
-    const int width = 192;
-    const int height = 108;
-    RenderWindow window(VideoMode(width * cellSize, height * cellSize), "Game of Life");
+    int width = 0;
+    int height = 0;
+    string answer = "";
+    string path = "";
+    cout << "Dimensions ([largeur]x[hauteur]): ";
+    cin >> answer;
+    path = "input/" + answer + ".txt";
+    ifstream file(path);
+    file >> width >> height;
+    file.close();
+    RenderWindow window(VideoMode(1920, 1080), "Game of Life");
     Grid grid(width, height, cellSize);
-    grid.initialize("input/192108.txt");
+    grid.initialize(path);
     bool paused = false;
 
     while (window.isOpen()) {
