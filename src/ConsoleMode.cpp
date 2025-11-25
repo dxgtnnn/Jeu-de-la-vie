@@ -3,7 +3,8 @@
 
 void ConsoleMode::run()
 {
-    string path;
+    string path = "";
+    string outpath = "";
     int iterations = 0;
 
     cout << "Fichier d'entree : ";
@@ -14,11 +15,11 @@ void ConsoleMode::run()
     Grid grid(192, 108, 1);
     grid.initialize(path);
 
-    string outDir = path + "_out";
-    create_directory(outDir);
+    outpath = path + "_out";
+    create_directory(outpath);
 
     for (int i = 0; i < iterations; i++) {
-        ofstream out(outDir + "/iteration_" + to_string(i) + ".txt");
+        ofstream out(outpath + "/iteration_" + to_string(i) + ".txt");
         out << "input/192108\n";
         for (int y = 0; y < 108; y++) {
             for (int x = 0; x < 192; x++) {
@@ -30,6 +31,5 @@ void ConsoleMode::run()
         }
         grid.update();
     }
-
-    cout << "Terminé ! Fichiers générés dans : " << outDir << endl;
+    cout << "Terminé ! Fichiers générés dans : " << outpath << endl;
 }

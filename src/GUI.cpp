@@ -36,5 +36,6 @@ void GUI::run()
             grid.update();
         window.clear();
         grid.game(window);
+        sleep(milliseconds(50));
     }
 }

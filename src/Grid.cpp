@@ -4,10 +4,12 @@
 
 Grid::Grid(int width, int height, int cellSize) : width(width), height(height), cellSize(cellSize), cells(width, vector<Cell*>(height, nullptr)) {}
 
-Grid::~Grid() {
-    for (auto& col : cells)
-        for (Cell* c : col)
-            delete c;
+Grid::~Grid()
+{
+    for (size_t i = 0; i < cells.size(); i++) {
+        for (size_t j = 0; j < cells[i].size(); j++)
+            delete cells[i][j];
+    }
 }
 
 void Grid::initialize(const string path)
@@ -22,10 +24,6 @@ void Grid::initialize(const string path)
         exit(84);
     }
     file >> wid >> hei;
-    if (wid != width || hei != height) {
-        cerr << "Erreur : dimensions du fichier (" << wid << "x" << hei << ") différentes des dimensions de la grille (" << width << "x" << height << ")\n";
-        exit(84);
-    }
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             file >> value;
@@ -97,9 +95,11 @@ void Grid::game(RenderWindow& window)
 
 void Grid::clickCell(int x, int y)
 {
+    Cell *old;
+
     if (x < 0 || x >= width || y < 0 || y >= height)
         return;
-    Cell *old = cells[x][y];
+    old = cells[x][y];
     if (old->isAlive())
         cells[x][y] = new DeadCell();
     else
