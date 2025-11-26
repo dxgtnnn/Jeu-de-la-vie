@@ -11,13 +11,14 @@ CPP = g++
 
 LIB = ar rc
 
-SRC	=	src/Grid.cpp 		\
-		src/main.cpp 		\
-		src/AliveCell.cpp 	\
-		src/DeadCell.cpp 	\
-		src/Game.cpp 		\
-		src/ConsoleMode.cpp \
-		src/GUI.cpp			\
+SRC	=	src/Grid.cpp 			\
+		src/main.cpp 			\
+		src/AliveCell.cpp 		\
+		src/DeadCell.cpp 		\
+		src/Game.cpp 			\
+		src/ConsoleMode.cpp 	\
+		src/GUI.cpp				\
+		src/ObstacleCell.cpp	\
 
 OBJ	=	$(SRC:.cpp=.o)
 

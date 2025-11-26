@@ -1,6 +1,7 @@
 #include "Grid.hpp"
 #include "AliveCell.hpp"
 #include "DeadCell.hpp"
+#include "ObstacleCell.hpp"
 
 Grid::Grid(int width, int height, int cellSize) : width(width), height(height), cellSize(cellSize), cells(width, vector<Cell*>(height, nullptr)) {}
 
@@ -28,8 +29,10 @@ void Grid::initialize(const string path)
             delete cells[x][y];
             if(value == 1)
                 cells[x][y] = new AliveCell();
-            else
+            else if (value == 0)
                 cells[x][y] = new DeadCell();
+            else
+                cells[x][y] = new ObstacleCell();
         }
     }
 }
@@ -42,34 +45,48 @@ int Grid::countNeighbors(int x, int y) const
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-            if (dx == 0 && dy == 0)
+            if (dx == 0 && dy == 0) 
                 continue;
             nx = (x + dx + width) % width;
             ny = (y + dy + height) % height;
+            if (dynamic_cast<ObstacleCell*>(cells[nx][ny]))
+                continue;
             if (cells[nx][ny]->isAlive())
                 count++;
         }
     }
+
     return count;
 }
 
 
 void Grid::update()
 {
-    vector<vector<Cell*>> next(width, vector<Cell*>(height));
+    vector<vector<Cell*>> next(width, vector<Cell*>(height, nullptr));
     int neighbors = 0;
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            neighbors = countNeighbors(x, y);
-            next[x][y] = cells[x][y]->nextState(neighbors);
+            Cell* current = cells[x][y];
+
+            if (dynamic_cast<ObstacleCell*>(current)) {
+                next[x][y] = current;
+            } else {
+                neighbors = countNeighbors(x, y);
+                next[x][y] = current->nextState(neighbors);
+            }
         }
     }
-    for (int x = 0; x < width; x++)
-        for (int y = 0; y < height; y++)
-            delete cells[x][y];
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            if (!dynamic_cast<ObstacleCell*>(cells[x][y])) {
+                delete cells[x][y];
+            }
+        }
+    }
     cells.swap(next);
 }
+
 
 void Grid::game(RenderWindow& window)
 {
@@ -78,12 +95,15 @@ void Grid::game(RenderWindow& window)
     window.clear();
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            if (cells[x][y]->isAlive()) {
-                cellShape.setFillColor(Color::Blue);
-                cellShape.setPosition(x * cellSize, y * cellSize);
+            cellShape.setPosition(x * cellSize, y * cellSize);
+            if (dynamic_cast<ObstacleCell*>(cells[x][y])) {
+                cellShape.setFillColor(Color::Red);
+                window.draw(cellShape);
+            } else if (cells[x][y]->isAlive()) {
+                cellShape.setFillColor(Color::White);
                 window.draw(cellShape);
             } else {
-                cellShape.setFillColor(Color::White); // Color(red, green, blue, opacity);
+                cellShape.setFillColor(Color(38, 196, 236, 150)); // Color(red, green, blue, opacity);
                 window.draw(cellShape);
             }
         }
@@ -95,14 +115,17 @@ void Grid::clickCell(int x, int y)
 {
     x = (x + width) % width;
     y = (y + height) % height;
-
     Cell* old = cells[x][y];
+
+    if (dynamic_cast<ObstacleCell*>(old))
+        return;
     if (old->isAlive())
         cells[x][y] = new DeadCell();
     else
         cells[x][y] = new AliveCell();
     delete old;
 }
+
 
 void Grid::clear()
 {
@@ -115,15 +138,23 @@ void Grid::clear()
 
 void Grid::randomize()
 {
-    for (int x = 0; x < width; x++)
+    int r = 0;
+    for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            delete cells[x][y];
-            if (rand() % 2)
+            if(!dynamic_cast<ObstacleCell*>(cells[x][y]))
+                delete cells[x][y];
+            r = rand() % 100;
+            if(r < 33)
+                cells[x][y] = new DeadCell();
+            else if(r < 99)
                 cells[x][y] = new AliveCell();
             else
-                cells[x][y] = new DeadCell();
+                cells[x][y] = new ObstacleCell();
         }
+    }
 }
+
+
 
 string Grid::getState() const
 {
