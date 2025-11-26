@@ -206,3 +206,24 @@ int Grid::getWidth()
 {
     return width;
 }
+
+void Grid::explode(int x, int y, int radius)
+{
+    int nx = 0;
+    int ny = 0;
+
+    for(int dx = -radius; dx <= radius; dx++) {
+        for(int dy = -radius; dy <= radius; dy++) {
+            if(dx*dx + dy*dy > radius*radius)
+                continue;
+            nx = (x + dx + width) % width;
+            ny = (y + dy + height) % height;
+            if(dynamic_cast<ObstacleCell*>(cells[nx][ny]))
+                continue;
+            if (!cells[nx][ny]->isAlive() && rand() % 100 < 70) {
+                delete cells[nx][ny];
+                cells[nx][ny] = new AliveCell();
+            }
+        }
+    }
+}

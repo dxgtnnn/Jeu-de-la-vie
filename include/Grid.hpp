@@ -24,4 +24,5 @@ class Grid {
         void spawnGlider(int startX, int startY);
         int getWidth();
         int getHeight();
+        void explode(int x, int y, int radius);
 };

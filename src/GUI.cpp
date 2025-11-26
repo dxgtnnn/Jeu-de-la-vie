@@ -6,6 +6,8 @@ void GUI::run()
     int width = 0;
     int height = 0;
     int numgliders = 0;
+    int x = 0;
+    int y = 0;
     bool paused = false;
     string answer = "";
     string path = "";
@@ -43,10 +45,13 @@ void GUI::run()
                     }
                 }
             }
-            if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
-                int x = event.mouseButton.x / cellSize;
-                int y = event.mouseButton.y / cellSize;
-                grid.clickCell(x, y);
+            if (event.type == Event::MouseButtonPressed) {
+                x = event.mouseButton.x / cellSize;
+                y = event.mouseButton.y / cellSize;
+                if (event.mouseButton.button == Mouse::Left)
+                    grid.clickCell(x, y);
+                if (event.mouseButton.button == Mouse::Right)
+                    grid.explode(x, y, 35);
             }
         }
         if (!paused)
