@@ -1,6 +1,5 @@
 #include "GUI.hpp"
 
-
 void GUI::run()
 {
     const int cellSize = 10;
@@ -10,7 +9,7 @@ void GUI::run()
     string answer = "";
     string path = "";
 
-    cout << "Dimensions ([largeur]x[hauteur]): ";
+    cout << "Dimensions ([Largeur]x[Hauteur]): ";
     cin >> answer;
     path = "input/" + answer + ".txt";
     ifstream file(path);

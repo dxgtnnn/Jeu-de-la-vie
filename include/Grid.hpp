@@ -21,6 +21,4 @@ class Grid {
         void randomize();
         bool getCellState(int x, int y) const;
         string getState() const;
-        int getWidth();
-        int getHeight();
 };

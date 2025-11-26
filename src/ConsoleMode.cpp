@@ -1,38 +1,42 @@
 #include "ConsoleMode.hpp"
 #include "Grid.hpp"
+#include <iostream>
+#include <fstream>
 
-void ConsoleMode::run()
-{
-    string answer = "";
-    string path = "";
-    string outpath = "";
-    int iterations = 0;
-    int wid = 0;
-    int hei = 0;
-    cout << "Dimensions ([largeur]x[hauteur]): ";
-    cin >> answer;
-    cout << "Nombre d'iterations : ";
+void ConsoleMode::run() {
+    string dim;
+    int iterations;
+
+    cout << "Dimensions ([Largeur]x[Hauteur]) : ";
+    cin >> dim;
+    cout << "Iterations : ";
     cin >> iterations;
-    path = "input/" + answer + ".txt";
+
+    string path = "input/" + dim + ".txt";
     ifstream file(path);
-    file >> wid >> hei;
+    if (!file) {
+        cerr << "Fichier introuvable !\n";
+        return;
+    }
+
+    int w, h;
+    file >> w >> h;
     file.close();
-    Grid grid(wid, hei, 1);
-    grid.initialize(path);
-    outpath = path + "_out";
-    create_directory(outpath);
+
+    Grid g(w, h, 1);
+    g.initialize(path);
+
+    string outDir = path + "_out";
+    create_directory(outDir);
 
     for (int i = 0; i < iterations; i++) {
-        ofstream out(outpath + "/iteration_" + to_string(i) + ".txt");
-        for (int y = 0; y < hei; y++) {
-            for (int x = 0; x < wid; x++) {
-                out << (grid.getCellState(x, y) ? 1 : 0);
-                if (x < wid - 1)
-                    out << " ";
-            }
-            out << "\n";
+        ofstream out(outDir + "/iteration_" + to_string(i) + ".txt");
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++)
+                out << g.getCellState(x, y) << (x < w - 1 ? ' ' : '\n');
         }
-        grid.update();
+        g.update();
     }
-    cout << "Terminé ! Fichiers générés dans : " << outpath << endl;
+
+    cout << "✓ Terminé → " << outDir << endl;
 }

@@ -12,16 +12,6 @@ Grid::~Grid()
     }
 }
 
-int Grid::getWidth()
-{
-    return width;
-}
-
-int Grid::getHeight()
-{
-    return height;
-}
-
 void Grid::initialize(const string path)
 {
     ifstream file(path);
@@ -49,19 +39,20 @@ int Grid::countNeighbors(int x, int y) const
     int count = 0;
     int nx = 0;
     int ny = 0;
+
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             if (dx == 0 && dy == 0)
                 continue;
-            nx = x + dx;
-            ny = y + dy;
-            if (nx >= 0 && nx < width && ny >= 0 && ny < height)
-                if (cells[nx][ny]->isAlive())
-                    count++;
+            nx = (x + dx + width) % width;
+            ny = (y + dy + height) % height;
+            if (cells[nx][ny]->isAlive())
+                count++;
         }
     }
     return count;
 }
+
 
 void Grid::update()
 {
@@ -102,11 +93,10 @@ void Grid::game(RenderWindow& window)
 
 void Grid::clickCell(int x, int y)
 {
-    Cell *old;
+    x = (x + width) % width;
+    y = (y + height) % height;
 
-    if (x < 0 || x >= width || y < 0 || y >= height)
-        return;
-    old = cells[x][y];
+    Cell* old = cells[x][y];
     if (old->isAlive())
         cells[x][y] = new DeadCell();
     else
