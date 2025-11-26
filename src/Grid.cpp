@@ -176,3 +176,33 @@ bool Grid::getCellState(int x, int y) const
 {
     return cells[x][y]->isAlive();
 }
+
+void Grid::spawnGlider(int startX, int startY)
+{
+    int x = 0;
+    int y = 0;
+
+    vector<pair<int, int>> pattern = {
+        {1, 0},
+        {2, 1},
+        {0, 2}, {1, 2}, {2, 2}
+    };
+    for (auto &p : pattern) {
+        x = (startX + p.first + width) % width;
+        y = (startY + p.second + height) % height;
+        if (!dynamic_cast<ObstacleCell*>(cells[x][y])) {
+            delete cells[x][y];
+            cells[x][y] = new AliveCell();
+        }
+    }
+}
+
+int Grid::getHeight()
+{
+    return height;
+}
+
+int Grid::getWidth()
+{
+    return width;
+}

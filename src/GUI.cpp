@@ -5,6 +5,7 @@ void GUI::run()
     const int cellSize = 10;
     int width = 0;
     int height = 0;
+    int numgliders = 0;
     bool paused = false;
     string answer = "";
     string path = "";
@@ -33,6 +34,14 @@ void GUI::run()
                     grid.randomize();
                 if (event.key.code == Keyboard::C)
                     grid.clear();
+                if (event.key.code == Keyboard::P) {
+                    numgliders = 3 + rand() % 3;
+                    for (int i = 0; i < numgliders; i++) {
+                        int randomX = rand() % grid.getWidth();
+                        int randomY = rand() % grid.getHeight();
+                        grid.spawnGlider(randomX, randomY);
+                    }
+                }
             }
             if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 int x = event.mouseButton.x / cellSize;

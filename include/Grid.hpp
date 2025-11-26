@@ -21,4 +21,7 @@ class Grid {
         void randomize();
         bool getCellState(int x, int y) const;
         string getState() const;
+        void spawnGlider(int startX, int startY);
+        int getWidth();
+        int getHeight();
 };
