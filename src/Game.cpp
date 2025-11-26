@@ -9,7 +9,7 @@ void Game::run()
     GUI gui;
 
     cout << "Choisissez un mode :" << endl;
-    cout << "1 - Terminal" << endl;
+    cout << "1 - Enregistrement dans des fichiers" << endl;
     cout << "2 - Visuel" << endl;
     cout << "Mon choix > ";
     cin >> choice;

@@ -13,10 +13,10 @@ void GUI::run()
     cout << "Dimensions ([largeur]x[hauteur]): ";
     cin >> answer;
     path = "input/" + answer + ".txt";
-    RenderWindow window(VideoMode(1920, 1080), "Game of Life");
     ifstream file(path);
     file >> width >> height;
     file.close();
+    RenderWindow window(VideoMode(width * cellSize, height * cellSize), "Game of Life");
     Grid grid(width, height, cellSize);
     grid.initialize(path);
 
