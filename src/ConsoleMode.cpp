@@ -54,7 +54,7 @@ void ConsoleMode::run()
     grid.initialize(path);
     outDir = filename + ".txt_out";
     create_directory(outDir);
-    for (int i = 0; i < iterations; i++) {
+    for (int i = 1; i <= iterations; i++) {
         saveIteration(outDir, grid, width, height, i);
         grid.update();
     }
