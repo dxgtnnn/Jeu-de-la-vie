@@ -3,7 +3,7 @@
 #include "DeadCell.hpp"
 #include "ObstacleCell.hpp"
 
-Grid::Grid(int width, int height, int cellSize) : width(width), height(height), cellSize(cellSize), cells(width, vector<Cell*>(height, nullptr)) {}
+Grid::Grid(int width, int height, int cellSize) : width(width), height(height), cellSize(cellSize), cells(width, vector<Cell*>(height, nullptr)), background(nullptr), ruleSet(new GameRuleSet()) {}
 
 Grid::~Grid()
 {
@@ -11,6 +11,8 @@ Grid::~Grid()
         for (size_t j = 0; j < cells[i].size(); j++)
             delete cells[i][j];
     }
+    delete background;
+    delete ruleSet;
 }
 
 void Grid::initialize(const string path)
@@ -45,7 +47,7 @@ int Grid::countNeighbors(int x, int y) const
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-            if (dx == 0 && dy == 0) 
+            if (dx == 0 && dy == 0)
                 continue;
             nx = (x + dx + width) % width;
             ny = (y + dy + height) % height;
@@ -58,7 +60,6 @@ int Grid::countNeighbors(int x, int y) const
 
     return count;
 }
-
 
 void Grid::update()
 {
@@ -73,7 +74,7 @@ void Grid::update()
                 next[x][y] = current;
             } else {
                 neighbors = countNeighbors(x, y);
-                next[x][y] = current->nextState(neighbors);
+                next[x][y] = ruleSet->applyRule(current, neighbors);
             }
         }
     }
@@ -87,12 +88,14 @@ void Grid::update()
     cells.swap(next);
 }
 
-
-void Grid::game(RenderWindow& window)
+void Grid::game(RenderWindow &window)
 {
     RectangleShape cellShape(Vector2f(cellSize - 1, cellSize - 1));
 
     window.clear();
+    if (background && background->isLoaded()) {
+        background->render(window);
+    }
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
             cellShape.setPosition(x * cellSize, y * cellSize);
@@ -100,61 +103,16 @@ void Grid::game(RenderWindow& window)
                 cellShape.setFillColor(Color::Red);
                 window.draw(cellShape);
             } else if (cells[x][y]->isAlive()) {
-                cellShape.setFillColor(Color::White);
+                cellShape.setFillColor(Color(0, 255, 127, 175));
                 window.draw(cellShape);
             } else {
-                cellShape.setFillColor(Color(38, 196, 236, 150)); // Color(red, green, blue, opacity);
+                cellShape.setFillColor(Color(38, 196, 236, 20));
                 window.draw(cellShape);
             }
         }
     }
     window.display();
 }
-
-void Grid::clickCell(int x, int y)
-{
-    x = (x + width) % width;
-    y = (y + height) % height;
-    Cell* old = cells[x][y];
-
-    if (dynamic_cast<ObstacleCell*>(old))
-        return;
-    if (old->isAlive())
-        cells[x][y] = new DeadCell();
-    else
-        cells[x][y] = new AliveCell();
-    delete old;
-}
-
-
-void Grid::clear()
-{
-    for (int x = 0; x < width; x++)
-        for (int y = 0; y < height; y++) {
-            delete cells[x][y];
-            cells[x][y] = new DeadCell();
-        }
-}
-
-void Grid::randomize()
-{
-    int r = 0;
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            if(!dynamic_cast<ObstacleCell*>(cells[x][y]))
-                delete cells[x][y];
-            r = rand() % 100;
-            if(r < 33)
-                cells[x][y] = new DeadCell();
-            else if(r < 99)
-                cells[x][y] = new AliveCell();
-            else
-                cells[x][y] = new ObstacleCell();
-        }
-    }
-}
-
-
 
 string Grid::getState() const
 {
@@ -177,26 +135,6 @@ bool Grid::getCellState(int x, int y) const
     return cells[x][y]->isAlive();
 }
 
-void Grid::spawnGlider(int startX, int startY)
-{
-    int x = 0;
-    int y = 0;
-
-    vector<pair<int, int>> pattern = {
-        {1, 0},
-        {2, 1},
-        {0, 2}, {1, 2}, {2, 2}
-    };
-    for (auto &p : pattern) {
-        x = (startX + p.first + width) % width;
-        y = (startY + p.second + height) % height;
-        if (!dynamic_cast<ObstacleCell*>(cells[x][y])) {
-            delete cells[x][y];
-            cells[x][y] = new AliveCell();
-        }
-    }
-}
-
 int Grid::getHeight()
 {
     return height;
@@ -207,23 +145,56 @@ int Grid::getWidth()
     return width;
 }
 
-void Grid::explode(int x, int y, int radius)
+// Nouvelles méthodes pour GameRule
+Cell* Grid::getCell(int x, int y)
 {
-    int nx = 0;
-    int ny = 0;
+    return cells[x][y];
+}
 
-    for(int dx = -radius; dx <= radius; dx++) {
-        for(int dy = -radius; dy <= radius; dy++) {
-            if(dx*dx + dy*dy > radius*radius)
-                continue;
-            nx = (x + dx + width) % width;
-            ny = (y + dy + height) % height;
-            if(dynamic_cast<ObstacleCell*>(cells[nx][ny]))
-                continue;
-            if (!cells[nx][ny]->isAlive() && rand() % 100 < 70) {
-                delete cells[nx][ny];
-                cells[nx][ny] = new AliveCell();
-            }
-        }
+void Grid::setCell(int x, int y, Cell* newCell)
+{
+    delete cells[x][y];
+    cells[x][y] = newCell;
+}
+
+// Gestion du background
+void Grid::setBackground(const string& path, float opacity)
+{
+    delete background;
+    background = new Background(path, opacity);
+    if (!background->load()) {
+        delete background;
+        background = nullptr;
     }
+}
+
+void Grid::removeBackground()
+{
+    delete background;
+    background = nullptr;
+}
+
+void Grid::updateBackgroundSize(int windowWidth, int windowHeight)
+{
+    if (background && background->isLoaded()) {
+        background->fitToWindow(windowWidth, windowHeight);
+    }
+}
+
+// Gestion des règles
+void Grid::setRuleSet(RuleType rule)
+{
+    ruleSet->setRule(rule);
+}
+
+RuleType Grid::getCurrentRule() const
+{
+    return ruleSet->getRule();
+}
+
+string Grid::getCurrentRuleName() const
+{
+    if (ruleSet == nullptr)
+        return "Unknown";
+    return ruleSet->getRuleName();
 }

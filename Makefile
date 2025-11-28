@@ -19,6 +19,10 @@ SRC	=	src/Grid.cpp 			\
 		src/ConsoleMode.cpp 	\
 		src/GUI.cpp				\
 		src/ObstacleCell.cpp	\
+		src/GameRule.cpp		\
+		src/Background.cpp		\
+		src/Assets.cpp			\
+		src/GameRuleSet.cpp		\
 
 OBJ	=	$(SRC:.cpp=.o)
 

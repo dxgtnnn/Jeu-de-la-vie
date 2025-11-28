@@ -3,6 +3,6 @@
 
 class ObstacleCell : public Cell {
     public:
-        bool isAlive() const override;           // Retourne false (ou true selon choix visuel)
-        Cell *nextState(int neighbors) const override; // Retourne toujours this type
+        bool isAlive() const override;
+        Cell *nextState(int neighbors) const override;
 };
