@@ -69,7 +69,6 @@ void Grid::update()
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
             Cell* current = cells[x][y];
-
             if (dynamic_cast<ObstacleCell*>(current)) {
                 next[x][y] = current;
             } else {
@@ -145,7 +144,6 @@ int Grid::getWidth()
     return width;
 }
 
-// Nouvelles méthodes pour GameRule
 Cell* Grid::getCell(int x, int y)
 {
     return cells[x][y];
@@ -157,7 +155,6 @@ void Grid::setCell(int x, int y, Cell* newCell)
     cells[x][y] = newCell;
 }
 
-// Gestion du background
 void Grid::setBackground(const string& path, float opacity)
 {
     delete background;
@@ -181,7 +178,6 @@ void Grid::updateBackgroundSize(int windowWidth, int windowHeight)
     }
 }
 
-// Gestion des règles
 void Grid::setRuleSet(RuleType rule)
 {
     ruleSet->setRule(rule);
