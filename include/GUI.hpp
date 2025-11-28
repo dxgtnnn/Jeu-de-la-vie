@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Grid.hpp"
+#include "Mode.hpp"
 
-class GUI {
+class GUI : public Mode {
     public:
         GUI() = default;
-        void run();
+        ~GUI() = default;
+        void run() override;
 };

@@ -42,7 +42,9 @@ void ConsoleMode::run()
     string path;
     string outDir;
     int iterations;
-    int width, height;
+    int width;
+    int height;
+
     if (!getUserInput(filename, iterations))
         return;
     if (!loadGridInfo(filename, width, height))
@@ -52,7 +54,6 @@ void ConsoleMode::run()
     grid.initialize(path);
     outDir = filename + ".txt_out";
     create_directory(outDir);
-
     for (int i = 0; i < iterations; i++) {
         saveIteration(outDir, grid, width, height, i);
         grid.update();

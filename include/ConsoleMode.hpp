@@ -1,7 +1,10 @@
 #pragma once
 
-class ConsoleMode {
+#include "Mode.hpp"
+
+class ConsoleMode : public Mode {
     public:
         ConsoleMode() = default;
-        void run();
+        ~ConsoleMode() = default;
+        void run() override;
 };

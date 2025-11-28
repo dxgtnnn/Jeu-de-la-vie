@@ -41,10 +41,13 @@ void Background::setScale(float scaleX, float scaleY)
 
 void Background::fitToWindow(int windowWidth, int windowHeight)
 {
+    Vector2u textureSize;
+    float scaleX;
+    float scaleY;
     if (!loaded)
         return;
-    Vector2u textureSize = texture.getSize();
-    float scaleX = static_cast<float>(windowWidth) / textureSize.x;
-    float scaleY = static_cast<float>(windowHeight) / textureSize.y;
+    textureSize = texture.getSize();
+    scaleX = static_cast<float>(windowWidth) / textureSize.x;
+    scaleY = static_cast<float>(windowHeight) / textureSize.y;
     setScale(scaleX, scaleY);
 }
