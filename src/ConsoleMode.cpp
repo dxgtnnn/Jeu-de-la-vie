@@ -29,7 +29,7 @@ static void saveIteration(const string &outDir, Grid &grid, int width, int heigh
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             out << (grid.getCellState(x, y) ? 1 : 0);
-            if (x < width - 1) 
+            if (x < width - 1)
                 out << " ";
         }
         out << "\n";
