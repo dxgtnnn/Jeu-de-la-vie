@@ -17,7 +17,7 @@ int main()
     cin >> width;
     cout << "Hauteur de la grille : ";
     cin >> height;
-    string filename = "input/" + to_string(width) + "x" + to_string(height) + ".txt";
+    string filename = "../input/" + to_string(width) + "x" + to_string(height) + ".txt";
     ofstream file(filename);
     if (!file) {
         cerr << "Erreur : impossible de créer le fichier " << filename << endl;
