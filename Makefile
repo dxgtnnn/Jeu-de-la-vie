@@ -41,21 +41,21 @@ $(NAME):	$(OBJ)
 # ============================================ #
 
 
-CRIT_SRC = 	tests/criterion_grid.cpp \
-	tests/criterion_grid_more.cpp \
-	tests/criterion_cells.cpp \
-	tests/criterion_cells_more.cpp \
-	tests/criterion_rules.cpp \
-	tests/criterion_rules_more.cpp \
-		src/Grid.cpp \
-		src/AliveCell.cpp \
-		src/DeadCell.cpp \
-		src/ObstacleCell.cpp \
-		src/GameRule.cpp \
-		src/GameRuleSet.cpp \
-		src/Background.cpp \
-		src/Assets.cpp \
-		src/Music.cpp
+CRIT_SRC = 	tests/criterion_grid.cpp 		\
+			tests/criterion_grid_more.cpp 	\
+			tests/criterion_cells.cpp 		\
+			tests/criterion_cells_more.cpp 	\
+			tests/criterion_rules.cpp 		\
+			tests/criterion_rules_more.cpp 	\
+			src/Grid.cpp 					\
+			src/AliveCell.cpp 				\
+			src/DeadCell.cpp 				\
+			src/ObstacleCell.cpp 			\
+			src/GameRule.cpp 				\
+			src/GameRuleSet.cpp 			\
+			src/Background.cpp 				\
+			src/Assets.cpp 					\
+			src/Music.cpp					\
 
 CRIT_OBJ = $(CRIT_SRC:.cpp=.o)
 CRIT_NAME = criterion_unit_tests
@@ -65,10 +65,6 @@ criterion_tests: $(CRIT_OBJ)
 	$(CPP) $(CRIT_OBJ) -o $(CRIT_NAME) -lcriterion -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 	./$(CRIT_NAME)
 
-clean_tests:
-	rm -f tests/*.o
-	rm $(CRIT_NAME)
-
 clean:
 		rm -f $(OBJ)
 		rm -f *~
@@ -77,6 +73,9 @@ clean:
 fclean:		clean
 	rm -f $(NAME)
 	rm -rf *_out
+	rm -f tests/*.o
+	rm $(CRIT_NAME)
+
 re:		fclean all
 
 run:	all
