@@ -2,8 +2,17 @@
 #include "AliveCell.hpp"
 #include "DeadCell.hpp"
 #include "ObstacleCell.hpp"
+#include <set>
 
-Grid::Grid(int width, int height, int cellSize) : width(width), height(height), cellSize(cellSize), cells(width, vector<Cell*>(height, nullptr)), background(nullptr), ruleSet(new GameRuleSet()) {}
+Grid::Grid(int width, int height, int cellSize) : width(width), height(height), cellSize(cellSize), background(nullptr), ruleSet(new GameRuleSet())
+{
+    cells = vector<vector<Cell*>>(width, vector<Cell*>(height, nullptr));
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            cells[x][y] = new DeadCell();
+        }
+    }
+}
 
 Grid::~Grid()
 {
@@ -24,12 +33,21 @@ void Grid::initialize(const string path)
         cerr << "Erreur : impossible d'ouvrir le fichier " << path << "\n" << endl;
         exit(84);
     }
-    file >> width >> height;
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    int newWidth = 0;
+    int newHeight = 0;
+    file >> newWidth >> newHeight;
+    for (size_t i = 0; i < cells.size(); i++) {
+        for (size_t j = 0; j < cells[i].size(); j++) {
+            delete cells[i][j];
+        }
+    }
+    width = newWidth;
+    height = newHeight;
+    cells = vector<vector<Cell*>>(width, vector<Cell*>(height, nullptr));
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
             file >> value;
-            delete cells[x][y];
-            if(value == 1)
+            if (value == 1)
                 cells[x][y] = new AliveCell();
             else if (value == 0)
                 cells[x][y] = new DeadCell();
@@ -57,7 +75,6 @@ int Grid::countNeighbors(int x, int y) const
                 count++;
         }
     }
-
     return count;
 }
 
@@ -105,7 +122,7 @@ void Grid::game(RenderWindow &window)
                 cellShape.setFillColor(Color(15, 157, 232, 150));
                 window.draw(cellShape);
             } else {
-                cellShape.setFillColor(Color(38, 196, 236, 20));
+                cellShape.setFillColor(Color(255, 255, 255, 20));
                 window.draw(cellShape);
             }
         }
