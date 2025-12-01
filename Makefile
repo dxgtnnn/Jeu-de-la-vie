@@ -64,6 +64,8 @@ criterion_tests: CXXFLAGS += -Iinclude -std=c++17 -Wall -Wextra
 criterion_tests: $(CRIT_OBJ)
 	$(CPP) $(CRIT_OBJ) -o $(CRIT_NAME) -lcriterion -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 	./$(CRIT_NAME)
+	rm -f tests/*.o
+	rm $(CRIT_NAME)
 
 clean:
 		rm -f $(OBJ)
@@ -73,8 +75,6 @@ clean:
 fclean:		clean
 	rm -f $(NAME)
 	rm -rf *_out
-	rm -f tests/*.o
-	rm $(CRIT_NAME)
 
 re:		fclean all
 
