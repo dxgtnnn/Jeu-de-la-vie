@@ -23,6 +23,7 @@ class GameRule {
         void spawnLightweightSpaceship(int startX, int startY);
         void spawnPentadecathlon(int startX, int startY);
         void spawnRandomPattern();
+        void spawnSpaceshipGun(int startX, int startY);
         void setGrid(Grid* newGrid);
         void randomizeWithObstacles();
 };

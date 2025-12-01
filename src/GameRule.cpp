@@ -274,7 +274,7 @@ void GameRule::spawnPentadecathlon(int startX, int startY)
 
 void GameRule::spawnRandomPattern()
 {
-    int patternChoice = rand() % 7;
+    int patternChoice = rand() % 8;
     int count = 2 + rand() % 4;
     int randomX = 0;
     int randomY = 0;
@@ -304,6 +304,9 @@ void GameRule::spawnRandomPattern()
             case 6:
                 spawnPentadecathlon(randomX, randomY);
                 break;
+            case 7:
+                spawnSpaceshipGun(randomX, randomY);
+                break;
         }
         patternChoice = rand() % 7;
     }
@@ -329,6 +332,33 @@ void GameRule::randomizeWithObstacles()
                 else
                     grid->setCell(x, y, new ObstacleCell());
             }
+        }
+    }
+}
+
+void GameRule::spawnSpaceshipGun(int startX, int startY)
+{
+    int width = grid->getWidth();
+    int height = grid->getHeight();
+    int x = 0;
+    int y = 0;
+
+    vector<pair<int, int>> pattern = {
+        {0,2},{0,3},{0,4},{0,5},{0,6},{0,7},{0,8},{0,10},{0,11},{0,12},{0,13},{0,14},
+        {2,0},{2,1},{2,5},{2,9},{2,14},{2,15},
+        {4,0},{4,1},{4,5},{4,9},{4,14},{4,15},
+        {6,2},{6,3},{6,4},{6,5},{6,6},{6,7},{6,8},{6,10},{6,11},{6,12},{6,13},{6,14},
+        {8,2},{8,3},{8,4},{8,5},{8,6},{8,7},{8,8},{8,10},{8,11},{8,12},{8,13},{8,14},
+        {10,0},{10,1},{10,5},{10,9},{10,14},{10,15},
+        {12,0},{12,1},{12,5},{12,9},{12,14},{12,15},
+        {14,2},{14,3},{14,4},{14,5},{14,6},{14,7},{14,8},{14,10},{14,11},{14,12},{14,13},{14,14}
+    };
+    for (auto &p : pattern) {
+        x = (startX + p.first + width) % width;
+        y = (startY + p.second + height) % height;
+        Cell* current = grid->getCell(x, y);
+        if (!dynamic_cast<ObstacleCell*>(current)) {
+            grid->setCell(x, y, new AliveCell());
         }
     }
 }
