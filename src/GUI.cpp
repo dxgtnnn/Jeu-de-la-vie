@@ -1,5 +1,6 @@
 #include "GUI.hpp"
 #include "GameRule.hpp"
+#include "Music.hpp"
 
 static void getUserInput(string &answer, int &ruleChoice)
 {
@@ -89,7 +90,7 @@ static void setupGrid(Grid &grid, const string &answer, int ruleChoice, int wind
     grid.updateBackgroundSize(windowWidth, windowHeight);
 }
 
-static void setupUI(Grid &grid, Font &font, Text &ruleText)
+static void setupUI(Grid &grid, Font &font, Text &ruleText, BgMusic &bgMusic)
 {
     if (font.loadFromFile("assets/DejaVuSans.ttf")) {
         ruleText.setFont(font);
@@ -98,14 +99,24 @@ static void setupUI(Grid &grid, Font &font, Text &ruleText)
         ruleText.setPosition(10, 10);
         ruleText.setString(grid.getCurrentRuleName());
     }
+    if (bgMusic.load()) {
+        bgMusic.setLoop(true);
+        bgMusic.play();
+    }
 }
 
-static void handleKeyPress(Keyboard::Key key, Grid &grid, GameRule &rules, bool &paused, Text &ruleText, RenderWindow &window)
+static void handleKeyPress(Keyboard::Key key, Grid &grid, GameRule &rules, bool &paused, Text &ruleText, RenderWindow &window, BgMusic &bgMusic)
 {
     if (key == Keyboard::Escape)
         window.close();
     if (key == Keyboard::Space)
         paused = !paused;
+    if (key == Keyboard::M) {
+        if (bgMusic.getIsPlaying())
+            bgMusic.pause();
+        else
+            bgMusic.play();
+    }
     if (key == Keyboard::R)
         rules.randomize();
     if (key == Keyboard::O)
@@ -198,14 +209,14 @@ static void handleResize(Event::SizeEvent &size, View &view, float zoomLevel, in
     grid.updateBackgroundSize(windowWidth, windowHeight);
 }
 
-static void handleEvents(RenderWindow &window, Grid &grid, GameRule &rules, bool &paused, int cellSize, bool &isDragging, Vector2i &lastMousePos, float &zoomLevel, int &windowWidth, int &windowHeight, View &view, Text &ruleText)
+static void handleEvents(RenderWindow &window, Grid &grid, GameRule &rules, bool &paused, int cellSize, bool &isDragging, Vector2i &lastMousePos, float &zoomLevel, int &windowWidth, int &windowHeight, View &view, Text &ruleText, BgMusic &music)
 {
     Event event;
     while (window.pollEvent(event)) {
         if (event.type == Event::Closed)
             window.close();
         if (event.type == Event::KeyPressed)
-            handleKeyPress(event.key.code, grid, rules, paused, ruleText, window);
+            handleKeyPress(event.key.code, grid, rules, paused, ruleText, window, music);
         if (event.type == Event::MouseButtonPressed)
             handleMousePress(event.mouseButton, window, rules, cellSize, isDragging, lastMousePos);
         if (event.type == Event::MouseButtonReleased) {
@@ -248,6 +259,7 @@ void GUI::run()
     Vector2i lastMousePos;
     Font font;
     Text ruleText;
+    BgMusic bgMusic("assets/music_game.ogg", 30.0f);
     getUserInput(answer, ruleChoice);
     RenderWindow window;
     initializeWindow(answer, width, height, cellSize, windowWidth, windowHeight, window);
@@ -255,9 +267,9 @@ void GUI::run()
     setupGrid(grid, answer, ruleChoice, windowWidth, windowHeight);
     GameRule rules(&grid);
     View view = window.getDefaultView();
-    setupUI(grid, font, ruleText);
+    setupUI(grid, font, ruleText, bgMusic);
     while (window.isOpen()) {
-        handleEvents(window, grid, rules, paused, cellSize, isDragging, lastMousePos, zoomLevel, windowWidth, windowHeight, view, ruleText);
+        handleEvents(window, grid, rules, paused, cellSize, isDragging, lastMousePos, zoomLevel, windowWidth, windowHeight, view, ruleText, bgMusic);
         if (!paused)
             grid.update();
         render(window, grid, view, font, ruleText);

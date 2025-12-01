@@ -23,6 +23,7 @@ SRC	=	src/Grid.cpp 			\
 		src/Background.cpp		\
 		src/Assets.cpp			\
 		src/GameRuleSet.cpp		\
+		src/Music.cpp			\
 
 OBJ	=	$(SRC:.cpp=.o)
 
@@ -33,7 +34,7 @@ CXXFLAGS =	-std=c++20 -Wall -Wextra -Werror -Iinclude
 all:		$(NAME)
 
 $(NAME):	$(OBJ)
-	$(CPP) $(OBJ) -o $(NAME) -lsfml-graphics -lsfml-window -lsfml-system
+	$(CPP) $(OBJ) -o $(NAME) -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 clean:
 		rm -f $(OBJ)
