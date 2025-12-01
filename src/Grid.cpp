@@ -102,7 +102,7 @@ void Grid::game(RenderWindow &window)
                 cellShape.setFillColor(Color::Red);
                 window.draw(cellShape);
             } else if (cells[x][y]->isAlive()) {
-                cellShape.setFillColor(Color(0, 255, 127, 175));
+                cellShape.setFillColor(Color(15, 157, 232, 150));
                 window.draw(cellShape);
             } else {
                 cellShape.setFillColor(Color(38, 196, 236, 20));
