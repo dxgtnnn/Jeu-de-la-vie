@@ -33,15 +33,15 @@ static void initializeWindow(const string &answer, int &width, int &height, int 
     file >> width >> height;
     file.close();
     VideoMode desktop = VideoMode::getDesktopMode();
-    maxWindowWidth = desktop.width * 0.9;
-    maxWindowHeight = desktop.height * 0.9;
+    maxWindowWidth = desktop.width * 0.95;
+    maxWindowHeight = desktop.height * 0.95;
     cellSizeByWidth = maxWindowWidth / width;
     cellSizeByHeight = maxWindowHeight / height;
     cellSize = min(cellSizeByWidth, cellSizeByHeight);
     if (cellSize < 3)
         cellSize = 3;
-    if (cellSize > 20)
-        cellSize = 20;
+    if (cellSize > 30)
+        cellSize = 30;
     windowWidth = width * cellSize;
     windowHeight = height * cellSize;
     window.create(VideoMode(windowWidth, windowHeight), "Game of Life", Style::Default);
@@ -105,18 +105,21 @@ static void setupUI(Grid &grid, Font &font, Text &ruleText, BgMusic &bgMusic)
     }
 }
 
-static void handleKeyPress(Keyboard::Key key, Grid &grid, GameRule &rules, bool &paused, Text &ruleText, RenderWindow &window, BgMusic &bgMusic)
+static void handleKeyPress(Keyboard::Key key, GUI *gui, Grid &grid, GameRule &rules, bool &paused, Text &ruleText, RenderWindow &window, BgMusic &bgMusic)
 {
     if (key == Keyboard::Escape)
         window.close();
-    if (key == Keyboard::Space)
+    if (key == Keyboard::Space) {
         paused = !paused;
-    if (key == Keyboard::M) {
         if (bgMusic.getIsPlaying())
             bgMusic.pause();
         else
             bgMusic.play();
     }
+    if (key == Keyboard::Left)
+        gui->adjustSpeed(5);  // Ralentir (ajouter 5ms)
+    if (key == Keyboard::Right)
+        gui->adjustSpeed(-5);  // Accélérer (soustraire 5ms)
     if (key == Keyboard::R)
         rules.randomize();
     if (key == Keyboard::O)
@@ -147,7 +150,10 @@ static void handleKeyPress(Keyboard::Key key, Grid &grid, GameRule &rules, bool 
         grid.setRuleSet(RuleType::STAFFORD);
     if (key == Keyboard::Num0)
         grid.setRuleSet(RuleType::MAZE);
+
+    // Mettre à jour le texte de la règle actuelle et notifier du changement
     ruleText.setString(grid.getCurrentRuleName());
+    gui->notifyRuleChange(grid.getCurrentRuleName());
 }
 
 static void handleMousePress(Event::MouseButtonEvent &mouseBtn, RenderWindow &window, GameRule &rules, int cellSize, bool &isDragging, Vector2i &lastMousePos)
@@ -207,16 +213,17 @@ static void handleResize(Event::SizeEvent &size, View &view, float zoomLevel, in
     windowWidth = size.width;
     windowHeight = size.height;
     grid.updateBackgroundSize(windowWidth, windowHeight);
+    grid.adaptCellSizeToWindow(windowWidth, windowHeight);
 }
 
-static void handleEvents(RenderWindow &window, Grid &grid, GameRule &rules, bool &paused, int cellSize, bool &isDragging, Vector2i &lastMousePos, float &zoomLevel, int &windowWidth, int &windowHeight, View &view, Text &ruleText, BgMusic &music)
+static void handleEvents(GUI *gui, RenderWindow &window, Grid &grid, GameRule &rules, bool &paused, int cellSize, bool &isDragging, Vector2i &lastMousePos, float &zoomLevel, int &windowWidth, int &windowHeight, View &view, Text &ruleText, BgMusic &music)
 {
     Event event;
     while (window.pollEvent(event)) {
         if (event.type == Event::Closed)
             window.close();
         if (event.type == Event::KeyPressed)
-            handleKeyPress(event.key.code, grid, rules, paused, ruleText, window, music);
+            handleKeyPress(event.key.code, gui, grid, rules, paused, ruleText, window, music);
         if (event.type == Event::MouseButtonPressed)
             handleMousePress(event.mouseButton, window, rules, cellSize, isDragging, lastMousePos);
         if (event.type == Event::MouseButtonReleased) {
@@ -232,15 +239,59 @@ static void handleEvents(RenderWindow &window, Grid &grid, GameRule &rules, bool
     }
 }
 
-static void render(RenderWindow &window, Grid &grid, View &view, Font &font, Text &ruleText)
+// Ajuste la vitesse de simulation: augmente ou diminue le délai entre itérations
+// delta > 0: ralentit (augmente le délai), delta < 0: accélère (diminue le délai)
+// Le délai reste contraint entre 10ms (minimum) et 1000ms (maximum)
+void GUI::adjustSpeed(int delta)
+{
+    speedDelay += delta;
+    if (speedDelay < 10)
+        speedDelay = 10;
+    if (speedDelay > 1000)
+        speedDelay = 1000;
+}
+
+// Enregistre le changement de mode et démarre le timer de notification (2 secondes)
+void GUI::notifyRuleChange(const std::string &ruleName)
+{
+    lastRuleChanged = ruleName;
+    ruleChangeTimer.restart();
+}
+
+// Vérifie si le message de notification du mode doit encore être affiché
+bool GUI::shouldShowRuleNotification() const
+{
+    return ruleChangeTimer.getElapsedTime().asSeconds() < 2.0f;
+}
+
+static void render(RenderWindow &window, Grid &grid, View &view, Font &font, Text &ruleText, int speedDelay, GUI *gui)
 {
     window.clear();
     grid.game(window);
     window.setView(window.getDefaultView());
+
+    // Afficher le nom de la règle habituelle en haut à gauche
     if (font.getInfo().family != "")
         window.draw(ruleText);
+
+    // Afficher une grande notification du mode changé si applicable
+    if (gui->shouldShowRuleNotification()) {
+        Text notificationText;
+        notificationText.setFont(font);
+        notificationText.setCharacterSize(80);
+        notificationText.setFillColor(Color(255, 255, 255, 200));
+        notificationText.setString(gui->getLastRuleChanged());
+
+        // Centrer le texte au milieu de l'écran
+        FloatRect textBounds = notificationText.getLocalBounds();
+        notificationText.setPosition(
+            (window.getSize().x - textBounds.width) / 2,
+            (window.getSize().y - textBounds.height) / 2
+        );
+        window.draw(notificationText);
+    }
     window.setView(view);
-    sleep(milliseconds(50));
+    sleep(milliseconds(speedDelay));
 }
 
 void GUI::run()
@@ -269,9 +320,9 @@ void GUI::run()
     View view = window.getDefaultView();
     setupUI(grid, font, ruleText, bgMusic);
     while (window.isOpen()) {
-        handleEvents(window, grid, rules, paused, cellSize, isDragging, lastMousePos, zoomLevel, windowWidth, windowHeight, view, ruleText, bgMusic);
+        handleEvents(this, window, grid, rules, paused, cellSize, isDragging, lastMousePos, zoomLevel, windowWidth, windowHeight, view, ruleText, bgMusic);
         if (!paused)
             grid.update();
-        render(window, grid, view, font, ruleText);
+        render(window, grid, view, font, ruleText, speedDelay, this);
     }
 }

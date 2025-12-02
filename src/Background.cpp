@@ -1,4 +1,5 @@
 #include "Background.hpp"
+#include <algorithm>
 
 Background::Background(const string& path, float opacity) : Assets(path), opacity(opacity), scale(1.0f, 1.0f) {}
 
@@ -44,10 +45,31 @@ void Background::fitToWindow(int windowWidth, int windowHeight)
     Vector2u textureSize;
     float scaleX;
     float scaleY;
+    float finalScale;
+    
     if (!loaded)
         return;
+    
     textureSize = texture.getSize();
+    
+    // Calculer l'échelle pour couvrir toute la fenêtre
+    // On utilise la plus grande échelle pour que l'image couvre complètement la fenêtre
     scaleX = static_cast<float>(windowWidth) / textureSize.x;
     scaleY = static_cast<float>(windowHeight) / textureSize.y;
-    setScale(scaleX, scaleY);
+    
+    // Prendre la plus grande échelle pour assurer une couverture complète
+    finalScale = max(scaleX, scaleY);
+    
+    // Appliquer l'échelle
+    sprite.setScale(finalScale, finalScale);
+    
+    // Centrer le sprite par rapport à la fenêtre après mise à l'échelle
+    Vector2f scaledSize(
+        textureSize.x * finalScale,
+        textureSize.y * finalScale
+    );
+    sprite.setPosition(
+        (windowWidth - scaledSize.x) / 2.0f,
+        (windowHeight - scaledSize.y) / 2.0f
+    );
 }

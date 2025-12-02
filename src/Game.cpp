@@ -2,6 +2,8 @@
 #include "ConsoleMode.hpp"
 #include "GUI.hpp"
 
+// Lance le jeu: affiche un menu pour choisir entre le mode console
+// (enregistrement fichier) et le mode graphique (GUI)
 void Game::run()
 {
     int choice;
