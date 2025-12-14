@@ -1,0 +1,26 @@
+Cell (classe abstraite)
+  ↑ (héritage)
+  ├── AliveCell
+  ├── DeadCell
+  └── ObstacleCell
+
+Mode (classe abstraite)
+  ↑ (héritage)
+  ├── GUI
+  └── ConsoleMode
+
+Assets (classe abstraite)
+  ↑ (héritage)
+  ├── Background
+  └── Music
+
+Game
+  │
+  └──→ Grid (agrégation)
+        │
+        ├──→ vector<Cell*> (agrégation polymorphe)
+        ├──→ Background* (agrégation)
+        └──→ GameRuleSet* (agrégation)
+
+GameRule ──→ Grid (association)
+GameRuleSet ──→ Cell (dépendance)

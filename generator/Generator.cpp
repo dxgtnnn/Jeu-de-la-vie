@@ -15,8 +15,12 @@ int main()
 
     cout << "Largeur de la grille : ";
     cin >> width;
+    if (width > 192)
+        width = 192;
     cout << "Hauteur de la grille : ";
     cin >> height;
+    if (height > 108)
+        height = 108;
     string filename = "input/" + to_string(width) + "x" + to_string(height) + ".txt";
     ofstream file(filename);
     if (!file) {

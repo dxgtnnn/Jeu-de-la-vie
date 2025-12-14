@@ -1,4 +1,5 @@
 #include "GUI.hpp"
+#include "Background.hpp"
 #include "GameRule.hpp"
 #include "Music.hpp"
 
@@ -7,7 +8,7 @@ static void getUserInput(string &answer, int &ruleChoice)
     cout << "Dimensions ([Largeur]x[Hauteur]): ";
     cin >> answer;
     cout << "\nChoisissez les règles du jeu :" << endl;
-    cout << "1 - Classic (Conway)" << endl;
+    cout << "1 - Classic" << endl;
     cout << "2 - Life is Short" << endl;
     cout << "3 - Day and Night" << endl;
     cout << "4 - Wrap Around" << endl;
@@ -33,8 +34,8 @@ static void initializeWindow(const string &answer, int &width, int &height, int 
     file >> width >> height;
     file.close();
     VideoMode desktop = VideoMode::getDesktopMode();
-    maxWindowWidth = desktop.width * 0.95;
-    maxWindowHeight = desktop.height * 0.95;
+    maxWindowWidth = desktop.width * 1.0;
+    maxWindowHeight = desktop.height * 1.0;
     cellSizeByWidth = maxWindowWidth / width;
     cellSizeByHeight = maxWindowHeight / height;
     cellSize = min(cellSizeByWidth, cellSizeByHeight);
@@ -86,16 +87,16 @@ static void setupGrid(Grid &grid, const string &answer, int ruleChoice, int wind
         default:
             grid.setRuleSet(RuleType::CLASSIC);
     }
-    grid.setBackground("assets/background.png", 100.0f);
+    grid.setBackground("assets/background.png", 250.0f);
     grid.updateBackgroundSize(windowWidth, windowHeight);
 }
 
 static void setupUI(Grid &grid, Font &font, Text &ruleText, BgMusic &bgMusic)
 {
-    if (font.loadFromFile("assets/DejaVuSans.ttf")) {
+    if (font.loadFromFile("assets/font.ttf")) {
         ruleText.setFont(font);
         ruleText.setCharacterSize(20);
-        ruleText.setFillColor(Color::White);
+        ruleText.setFillColor(Color::Blue);
         ruleText.setPosition(10, 10);
         ruleText.setString(grid.getCurrentRuleName());
     }
@@ -105,21 +106,30 @@ static void setupUI(Grid &grid, Font &font, Text &ruleText, BgMusic &bgMusic)
     }
 }
 
-static void handleKeyPress(Keyboard::Key key, GUI *gui, Grid &grid, GameRule &rules, bool &paused, Text &ruleText, RenderWindow &window, BgMusic &bgMusic)
+static void handleKeyPress(Keyboard::Key key, GUI *gui, Grid &grid, GameRule &rules, bool &paused, RenderWindow &window, BgMusic &bgMusic)
 {
     if (key == Keyboard::Escape)
         window.close();
     if (key == Keyboard::Space) {
         paused = !paused;
+        gui->setQuietPauseMode(false);
+        if (bgMusic.getIsPlaying())
+            bgMusic.pause();
+        else
+            bgMusic.play();
+    }
+    if (key == Keyboard::B) {
+        paused = !paused;
+        gui->setQuietPauseMode(true);
         if (bgMusic.getIsPlaying())
             bgMusic.pause();
         else
             bgMusic.play();
     }
     if (key == Keyboard::Left)
-        gui->adjustSpeed(5);  // Ralentir (ajouter 5ms)
+        gui->adjustSpeed(5);
     if (key == Keyboard::Right)
-        gui->adjustSpeed(-5);  // Accélérer (soustraire 5ms)
+        gui->adjustSpeed(-5);
     if (key == Keyboard::R)
         rules.randomize();
     if (key == Keyboard::O)
@@ -130,30 +140,31 @@ static void handleKeyPress(Keyboard::Key key, GUI *gui, Grid &grid, GameRule &ru
         rules.spawnRandomPattern();
     if (key == Keyboard::I)
         rules.invertAll();
-    if (key == Keyboard::Num1)
+    if (key == Keyboard::Num1 || key == (Keyboard::Key)27)
         grid.setRuleSet(RuleType::CLASSIC);
-    if (key == Keyboard::Num2)
+    if (key == Keyboard::Num2 || key == (Keyboard::Key)28)
         grid.setRuleSet(RuleType::LIFE_IS_SHORT);
-    if (key == Keyboard::Num3)
+    if (key == Keyboard::Num3 || key == (Keyboard::Key)29)
         grid.setRuleSet(RuleType::DAY_AND_NIGHT);
-    if (key == Keyboard::Num4)
+    if (key == Keyboard::Num4 || key == (Keyboard::Key)51)
         grid.setRuleSet(RuleType::WRAPAROUND);
-    if (key == Keyboard::Num5)
+    if (key == Keyboard::Num5 || key == (Keyboard::Key)31)
         grid.setRuleSet(RuleType::LONELY_WORLD);
-    if (key == Keyboard::Num6)
+    if (key == Keyboard::Num6 || key == (Keyboard::Key)56)
         grid.setRuleSet(RuleType::SEEDS);
-    if (key == Keyboard::Num7)
+    if (key == Keyboard::Num7 || key == (Keyboard::Key)33)
         grid.setRuleSet(RuleType::HIGHLIFE);
-    if (key == Keyboard::Num8)
+    if (key == Keyboard::Num8 || key == (Keyboard::Key)34)
         grid.setRuleSet(RuleType::CORAL_GROWTH);
-    if (key == Keyboard::Num9)
+    if (key == Keyboard::Num9 || key == (Keyboard::Key)36)
         grid.setRuleSet(RuleType::STAFFORD);
     if (key == Keyboard::Num0)
         grid.setRuleSet(RuleType::MAZE);
-
-    // Mettre à jour le texte de la règle actuelle et notifier du changement
-    ruleText.setString(grid.getCurrentRuleName());
-    gui->notifyRuleChange(grid.getCurrentRuleName());
+    if ((key >= Keyboard::Num0 && key <= Keyboard::Num9) ||
+        key == (Keyboard::Key)27 || key == (Keyboard::Key)28 || key == (Keyboard::Key)29 ||
+        key == (Keyboard::Key)31 || key == (Keyboard::Key)33 || key == (Keyboard::Key)34 ||
+        key == (Keyboard::Key)36 || key == (Keyboard::Key)51 || key == (Keyboard::Key)56)
+        gui->notifyRuleChange(grid.getCurrentRuleName());
 }
 
 static void handleMousePress(Event::MouseButtonEvent &mouseBtn, RenderWindow &window, GameRule &rules, int cellSize, bool &isDragging, Vector2i &lastMousePos)
@@ -216,14 +227,14 @@ static void handleResize(Event::SizeEvent &size, View &view, float zoomLevel, in
     grid.adaptCellSizeToWindow(windowWidth, windowHeight);
 }
 
-static void handleEvents(GUI *gui, RenderWindow &window, Grid &grid, GameRule &rules, bool &paused, int cellSize, bool &isDragging, Vector2i &lastMousePos, float &zoomLevel, int &windowWidth, int &windowHeight, View &view, Text &ruleText, BgMusic &music)
+static void handleEvents(GUI *gui, RenderWindow &window, Grid &grid, GameRule &rules, bool &paused, int cellSize, bool &isDragging, Vector2i &lastMousePos, float &zoomLevel, int &windowWidth, int &windowHeight, View &view, BgMusic &music)
 {
     Event event;
     while (window.pollEvent(event)) {
         if (event.type == Event::Closed)
             window.close();
         if (event.type == Event::KeyPressed)
-            handleKeyPress(event.key.code, gui, grid, rules, paused, ruleText, window, music);
+            handleKeyPress(event.key.code, gui, grid, rules, paused, window, music);
         if (event.type == Event::MouseButtonPressed)
             handleMousePress(event.mouseButton, window, rules, cellSize, isDragging, lastMousePos);
         if (event.type == Event::MouseButtonReleased) {
@@ -239,9 +250,6 @@ static void handleEvents(GUI *gui, RenderWindow &window, Grid &grid, GameRule &r
     }
 }
 
-// Ajuste la vitesse de simulation: augmente ou diminue le délai entre itérations
-// delta > 0: ralentit (augmente le délai), delta < 0: accélère (diminue le délai)
-// Le délai reste contraint entre 10ms (minimum) et 1000ms (maximum)
 void GUI::adjustSpeed(int delta)
 {
     speedDelay += delta;
@@ -251,38 +259,39 @@ void GUI::adjustSpeed(int delta)
         speedDelay = 1000;
 }
 
-// Enregistre le changement de mode et démarre le timer de notification (2 secondes)
-void GUI::notifyRuleChange(const std::string &ruleName)
+void GUI::notifyRuleChange(const string &ruleName)
 {
     lastRuleChanged = ruleName;
     ruleChangeTimer.restart();
 }
 
-// Vérifie si le message de notification du mode doit encore être affiché
 bool GUI::shouldShowRuleNotification() const
 {
     return ruleChangeTimer.getElapsedTime().asSeconds() < 2.0f;
 }
 
-static void render(RenderWindow &window, Grid &grid, View &view, Font &font, Text &ruleText, int speedDelay, GUI *gui)
+static void render(RenderWindow &window, Grid &grid, View &view, Font &font, int speedDelay, GUI *gui, bool paused, Background *pauseBg)
 {
     window.clear();
-    grid.game(window);
+    if (paused) {
+        if (!gui->isQuietPauseMode()) {
+            if (pauseBg && pauseBg->isLoaded())
+                pauseBg->render(window);
+        } else {
+            grid.game(window);
+        }
+    } else {
+        grid.game(window);
+    }
+
     window.setView(window.getDefaultView());
-
-    // Afficher le nom de la règle habituelle en haut à gauche
-    if (font.getInfo().family != "")
-        window.draw(ruleText);
-
-    // Afficher une grande notification du mode changé si applicable
     if (gui->shouldShowRuleNotification()) {
         Text notificationText;
         notificationText.setFont(font);
         notificationText.setCharacterSize(80);
-        notificationText.setFillColor(Color(255, 255, 255, 200));
+        notificationText.setFillColor(Color::Blue);
         notificationText.setString(gui->getLastRuleChanged());
 
-        // Centrer le texte au milieu de l'écran
         FloatRect textBounds = notificationText.getLocalBounds();
         notificationText.setPosition(
             (window.getSize().x - textBounds.width) / 2,
@@ -290,6 +299,7 @@ static void render(RenderWindow &window, Grid &grid, View &view, Font &font, Tex
         );
         window.draw(notificationText);
     }
+    window.display();
     window.setView(view);
     sleep(milliseconds(speedDelay));
 }
@@ -319,10 +329,16 @@ void GUI::run()
     GameRule rules(&grid);
     View view = window.getDefaultView();
     setupUI(grid, font, ruleText, bgMusic);
+
+    Background pauseBackground("assets/background-pause.png", 255.0f);
+    if (pauseBackground.load()) {
+        pauseBackground.fitToWindow(windowWidth, windowHeight);
+    }
+
     while (window.isOpen()) {
-        handleEvents(this, window, grid, rules, paused, cellSize, isDragging, lastMousePos, zoomLevel, windowWidth, windowHeight, view, ruleText, bgMusic);
+        handleEvents(this, window, grid, rules, paused, cellSize, isDragging, lastMousePos, zoomLevel, windowWidth, windowHeight, view, bgMusic);
         if (!paused)
             grid.update();
-        render(window, grid, view, font, ruleText, speedDelay, this);
+        render(window, grid, view, font, speedDelay, this, paused, &pauseBackground);
     }
 }

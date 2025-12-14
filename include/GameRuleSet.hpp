@@ -30,18 +30,14 @@ class GameRuleSet {
         Cell *staffordRule(Cell *current, int neighbors) const;
 
     public:
-        // Constructeur: initialise avec la règle spécifiée (par défaut CLASSIC)
+
         GameRuleSet(RuleType rule = RuleType::CLASSIC);
 
-        // Applique la règle d'évolution actuellement active et retourne le nouvel état
         Cell* applyRule(Cell* current, int neighbors) const;
 
-        // Change la règle d'évolution active
         void setRule(RuleType rule);
 
-        // Retourne l'enum de la règle d'évolution actuellement active
         RuleType getRule() const;
 
-        // Retourne le nom descriptif de la règle actuellement active (ex: "Classic (Conway)")
         string getRuleName() const;
 };

@@ -3,11 +3,8 @@
 #include "DeadCell.hpp"
 #include "ObstacleCell.hpp"
 
-// Constructeur: initialise avec la règle spécifiée (par défaut CLASSIC)
 GameRuleSet::GameRuleSet(RuleType rule) : currentRule(rule) {}
 
-// Applique la règle d'évolution actuellement active en fonction du nombre de voisins
-// Retourne un pointeur vers une nouvelle cellule représentant l'état suivant
 Cell *GameRuleSet::applyRule(Cell *current, int neighbors) const
 {
     switch (currentRule) {
@@ -36,24 +33,21 @@ Cell *GameRuleSet::applyRule(Cell *current, int neighbors) const
     }
 }
 
-// Change la règle d'évolution active
 void GameRuleSet::setRule(RuleType rule)
 {
     currentRule = rule;
 }
 
-// Retourne la règle d'évolution actuellement active
 RuleType GameRuleSet::getRule() const
 {
     return currentRule;
 }
 
-// Retourne le nom descriptif de la règle actuellement active
 string GameRuleSet::getRuleName() const
 {
     switch (currentRule) {
         case RuleType::CLASSIC:
-            return "Classic (Conway)";
+            return "Classic";
         case RuleType::LIFE_IS_SHORT:
             return "Life is Short";
         case RuleType::DAY_AND_NIGHT:
@@ -77,9 +71,6 @@ string GameRuleSet::getRuleName() const
     }
 }
 
-// Applique la règle classique de Conway:
-// Vivante: 2-3 voisins = survit, sinon = meurt
-// Morte: exactement 3 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::classicRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
@@ -93,12 +84,11 @@ Cell *GameRuleSet::classicRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Life is Short":
-// Vivante: meurt toujours (la vie est courte!)
-// Morte: 2 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::lifeIsShortRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
+        if (neighbors == 2)
+            return new AliveCell();
         return new DeadCell();
     } else {
         if (neighbors == 2)
@@ -107,9 +97,6 @@ Cell *GameRuleSet::lifeIsShortRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Day and Night":
-// Vivante: 3,4,6,7,8 voisins = survit, sinon = meurt
-// Morte: 3,6,7,8 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::dayAndNightRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
@@ -123,9 +110,6 @@ Cell *GameRuleSet::dayAndNightRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Maze":
-// Vivante: 1-5 voisins = survit, sinon = meurt
-// Morte: 3 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::mazeRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
@@ -139,9 +123,6 @@ Cell *GameRuleSet::mazeRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Wrap Around":
-// Vivante: 2-4 voisins = survit, sinon = meurt
-// Morte: 3-4 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::wrapAroundRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
@@ -155,9 +136,6 @@ Cell *GameRuleSet::wrapAroundRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Lonely World":
-// Vivante: exactement 1 voisin = survit, sinon = meurt
-// Morte: exactement 1 voisin = renaît, sinon = reste morte
 Cell *GameRuleSet::lonelyWorldRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
@@ -171,9 +149,6 @@ Cell *GameRuleSet::lonelyWorldRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Seeds":
-// Vivante: meurt toujours
-// Morte: exactement 2 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::seedsRule(Cell *current, int neighbors) const
 {
     if (!current->isAlive() && neighbors == 2)
@@ -181,9 +156,6 @@ Cell *GameRuleSet::seedsRule(Cell *current, int neighbors) const
     return new DeadCell();
 }
 
-// Applique la règle "HighLife":
-// Vivante: 2-3 voisins = survit, sinon = meurt
-// Morte: 3 ou 6 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::highLifeRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
@@ -197,9 +169,6 @@ Cell *GameRuleSet::highLifeRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Coral Growth":
-// Vivante: 4-8 voisins = survit, sinon = meurt
-// Morte: 3 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::coralGrowthRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
@@ -213,9 +182,6 @@ Cell *GameRuleSet::coralGrowthRule(Cell *current, int neighbors) const
     }
 }
 
-// Applique la règle "Stafford":
-// Vivante: 3-5 voisins = survit, sinon = meurt
-// Morte: 3, 6, 7 ou 8 voisins = renaît, sinon = reste morte
 Cell *GameRuleSet::staffordRule(Cell *current, int neighbors) const
 {
     if (current->isAlive()) {
